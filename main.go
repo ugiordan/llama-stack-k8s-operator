@@ -28,8 +28,10 @@ import (
 	"go.uber.org/zap/zapcore"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	corev1 "k8s.io/api/core/v1"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -120,6 +122,11 @@ func main() {
 		// if you are doing or is intended to do any operation such as perform cleanups
 		// after the manager stops then its usage might be unsafe.
 		// LeaderElectionReleaseOnCancel: true,
+		Cache: cache.Options{
+			ByObject: map[client.Object]cache.ByObject{
+				&corev1.ConfigMap{}: {Namespaces: map[string]cache.Config{}},
+			},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "failed to start manager")

@@ -52,7 +52,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -566,15 +565,6 @@ func (r *LlamaStackDistributionReconciler) SetupWithManager(ctx context.Context,
 		Owns(&corev1.Service{}).
 		Owns(&networkingv1.NetworkPolicy{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
-		Watches(
-			&corev1.ConfigMap{},
-			handler.EnqueueRequestsFromMapFunc(r.findLlamaStackDistributionsForConfigMap),
-			builder.WithPredicates(predicate.Funcs{
-				UpdateFunc: r.configMapUpdatePredicate,
-				CreateFunc: r.configMapCreatePredicate,
-				DeleteFunc: r.configMapDeletePredicate,
-			}),
-		).
 		Complete(r)
 }
 
